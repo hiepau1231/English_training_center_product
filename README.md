@@ -17,10 +17,10 @@ This application is built for the following purposes:
 ### Prerequisites
 
 Ensure you have the following installed:
-- Node.js
-- npm
+- Node.js (v14 or later) installed on your machine.
+- npm (Node Package Manager) or Yarn installed.
 
-### Installation
+### server-side Installation
 
 1. Clone the repository:
     - git clone https://github.com/DatEdric/English_training_center_product.git
@@ -75,6 +75,30 @@ npx jest tests/teacherAPI.test.js
         - method: GET: http://localhost:3000/teacher/deleted-all
         - method: PUT: http://localhost:3000/teacher/restore/:id
         - method: DELETE: http://localhost:3000/teacher/force-delete
-        
 
+#### Client-side Installation
+1. Clone the repository:
+    - git clone https://github.com/DatEdric/English_center_product_FE.git
+    After cloning, navigate into the project directory:
+    - cd English_center_product_FE
+    To view all available branches, use the command:
+    - git branch -a
+    - git checkout -b master origin/master
+    - git branch
+2. Install dependencies:
+    - npm install
+3. Running the Application
+    You can run the application using either of the following commands:
+    - npm run dev
+#####
+1.
+    - Enter the following address into the browser's search bar: http://localhost:5000/
+
+    - "Since the website is in the testing phase, it is not fully complete in terms of user experience.
+
+    - To view the classrooms, teacher schedules, and lessons for a specific day that are currently active, select the 'Features' section, then choose 'Classroom' or 'Schedule Daily' or 'Teacher Schedule. You will see an interface to check the classrooms, teacher schedules, lessons, and other related information.
+
+    - Continue by selecting the classroom and the date you want to check in the input fields, then click 'Submit' to see the list of classes, lesson schedules, and teachers available in the selected classroom. You can also edit by clicking the 'Edit' button or delete by clicking the 'Delete' button.
+
+    - If you want to see the classes that have been deleted, you can click the trash icon to view and restore them
 This version includes all the specific command instructions inside the `README.md` file.
