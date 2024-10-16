@@ -3,6 +3,17 @@ const { Class, Schedule, Course, Classroom, Teacher, Shift } = require('../model
 const { Op } = require('sequelize');
 
 class RoomRepository {
+    async getRooms() {
+        try {
+            return await Classroom.findAll({
+                attributes: ['id', 'classroom_name', 'capacity', 'type'],
+                where: {deleted_at: null}
+            })
+        } catch (error) {
+            console.error("Error in RoomRepository:", error);
+            throw error;
+        }
+    }
     async getAllRooms(classroomName, scheduleDate) {
         try {
             return await Class.findAll({
@@ -48,7 +59,7 @@ class RoomRepository {
                  },
             });
         } catch (error) {
-            console.error("Error in RoomRepository:", error);   
+            console.error("Error in RoomRepository:", error);
             throw error;
         }
     }
@@ -233,6 +244,39 @@ class RoomRepository {
                 where: {
                     is_deleted: true
                 },
+                include: [
+                    {
+                        model: Schedule,
+                        as: 'schedules',
+                        required: false,
+                        attributes: ['schedule_date'],
+                        include: [
+                            {
+                                model: Shift,
+                                as: 'shift',
+                                attributes: ['teaching_shift'],
+                            },
+                        ],
+                    },
+                    {
+                        model: Classroom,
+                        as: 'classroom',
+                        required: false,
+                        attributes: ['classroom_name', 'capacity', 'type'],
+                    },
+                    {
+                        model: Course,
+                        as: 'course',
+                        required: false,
+                        attributes: ['course_name'],
+                    },
+                    {
+                        model: Teacher,
+                        as: 'MainTeacher',
+                        required: false,
+                        attributes: ['teacher_name'],
+                    },
+                ],
                 attributes:['id', 'class_name', 'start_date', 'end_date', 'updated_at', 'deleted_at', 'is_deleted']
             });
             

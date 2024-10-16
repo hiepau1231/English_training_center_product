@@ -2,8 +2,14 @@ const scheduleRepository = require('../repositories/scheduleRepository');
 
 
 class ScheduleService {
+    async getSchedules() {
+        try {
+            return await scheduleRepository.getSchedules();
+        } catch (error) {
+            console.error("Error in ScheduleService:", error);
+        }
+    }
     async getAllSchedules(date) {
-        console.log(date,"service");
         try {
             return await scheduleRepository.getAllSchedules(date);
         } catch (error) {

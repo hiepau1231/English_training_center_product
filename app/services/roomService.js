@@ -2,6 +2,13 @@ const roomRepository = require('../repositories/roomRepository');
 
 
 class RoomService {
+    async getRooms() {
+        try {
+            return await roomRepository.getRooms();
+        } catch (error) {
+            console.error("Error in RoomService:", error);
+        }
+    }
     async getAllRooms(classroomName, scheduleDate) {
         try {
             return await roomRepository.getAllRooms(classroomName, scheduleDate);

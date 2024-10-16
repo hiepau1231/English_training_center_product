@@ -2,6 +2,17 @@ const teacherService = require('../services/teacherService');
 
 
 class TeacherController {
+    async getTeachers(req, res) {
+        try {
+         const teacher = await teacherService.getTeachers();
+         if(!teacher || teacher.length === 0) {
+            return res.status(404).json({ message: 'No teacher Schedule found'})
+         }
+         res.status(200).json(teacher)
+        } catch (error) {
+         res.status(500).json({message: error.message})
+        }
+     }
     async getTeacherSchedules(req, res) {
        try {
         const date = req.body.date;

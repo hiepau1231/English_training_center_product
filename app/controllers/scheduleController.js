@@ -1,6 +1,17 @@
 const scheduleService = require('../services/scheduleService');
 
 class ScheduleController {
+    async getSchedules(req, res) {
+        try {
+             const result =  await scheduleService.getSchedules();
+            if(!result[0] === 0) {
+                return res.status(404).json({message: 'can not get classrooms'});
+            }
+            res.status(200).json({result});
+        } catch (error) {
+            return res.status(500).json({message: error.message});
+        }
+    }
     async getAllSchedules(req, res) {
         try {
             const { date } = req.body;

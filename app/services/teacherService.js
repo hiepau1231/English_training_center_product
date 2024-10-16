@@ -1,6 +1,13 @@
 const tearcherRepository = require('../repositories/teacherRepository');
 
 class TeacherService {
+    async getTeachers() {
+        try {
+            return await tearcherRepository.getTeachers();
+        } catch (error) {
+            console.error("Error in TeacherScheduleService:", error);
+        }
+    }
     async getTeacherSchedules(date) {
         try {
             return await tearcherRepository.getTeacherSchedules(date);

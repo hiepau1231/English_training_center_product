@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const roomController = require('../app/controllers/roomController');
 
-// router.get('/', roomController.getAllRooms);
+router.get('/', roomController.getRooms);
 router.post('/', roomController.getAllRooms);
 router.get('/edit/:id', roomController.findRoomById);
 router.put('/update/:id',roomController.updateRoomById);

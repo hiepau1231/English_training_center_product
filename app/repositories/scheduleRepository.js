@@ -4,6 +4,21 @@ const { Op } = require('sequelize');
 
 
 class ScheduleRepository {
+    async getSchedules() {
+        try {
+            return await Schedule.findAll({
+                attributes: [
+                    ['id', 'schedule_id'],
+                    ['schedule_date', 'date'],
+                    ['attendance', 'attendance'],
+                ],
+                where: { deleted_at: null}
+            })
+        } catch (error) {
+            console.error("Error in ScheduleRepository:", error);
+            throw error;
+        }
+    }
 
     async getAllSchedules(date) {
         
@@ -58,6 +73,7 @@ class ScheduleRepository {
             });
         } catch (error) {
             console.error("Error in ScheduleRepository:", error);
+            throw error;
         }
 
     }

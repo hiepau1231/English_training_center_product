@@ -1,6 +1,17 @@
 const roomService = require('../services/roomService');
 
 class RoomController {
+    async getRooms(req, res) {
+        try {
+            const result = await roomService.getRooms();
+            if(!result[0] === 0) {
+                return res.status(404).json({message: 'can not get classrooms'});
+            }
+            res.status(200).json({result});
+        } catch (error) {
+            return res.status(500).json({message: error.message});
+        }
+    }
     async getAllRooms(req, res) {
         try {
             const { classroomName, scheduleDate } = req.body;

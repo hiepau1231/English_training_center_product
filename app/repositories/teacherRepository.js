@@ -3,6 +3,17 @@ const { Class, Schedule, Course, Classroom, Teacher, Shift } = require('../model
 const { Op, Model } = require('sequelize');
 
 class TeacherRepository {
+    async getTeachers() {
+        try {
+            return await Teacher.findAll({
+                attributes: ['id', 'teacher_name'],
+                where: {deleted_at: null}
+            })
+        } catch (error) {
+            console.error('Error fetching teacher schedules:', error);
+            throw error;
+        }
+    }
     async getTeacherSchedules(schedule_date) {
         try {
             
