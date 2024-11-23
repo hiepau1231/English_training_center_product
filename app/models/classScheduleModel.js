@@ -1,42 +1,39 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
 
-const Teacher = require('./teacherModel');
-const Level = require('./levelModel');
-
-const TeacherLevel = sequelize.define(
-  'TeacherLevel',
+const ClassSchedule = sequelize.define(
+  'ClassSchedule',
   {
-    id: {
-      type: DataTypes.INTEGER(11),
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-    },
-    level_id: {
+    class_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      references: { model: Level, key: 'id' },
+      references: {
+        model: 'classes',
+        key: 'id',
+      },
     },
-    teacher_id: {
+    schedule_id: {
       type: DataTypes.INTEGER(11),
-      allowNull: true,
-      references: { model: Teacher, key: 'id' },
+      allowNull: false,
+      references: {
+        model: 'schedules',
+        key: 'id',
+      },
     },
     created_at: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATE ,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: DataTypes.NOW,
     },
     updated_at: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-      onUpdate: sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: DataTypes.NOW,
     },
     deleted_at: {
       type: DataTypes.DATE,
       allowNull: true,
+      defaultValue: null,
     },
     is_deleted: {
       type: DataTypes.BOOLEAN,
@@ -45,12 +42,13 @@ const TeacherLevel = sequelize.define(
     },
   },
   {
-    tableName: 'teacher_level',
+    tableName: 'class_schedules',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
+    
   }
 );
 
-module.exports = TeacherLevel;
+module.exports = ClassSchedule;

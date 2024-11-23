@@ -14,7 +14,12 @@ module.exports = {
         allowNull: false,
       },
       type: {
-        type: Sequelize.ENUM('Phòng Nghe Nhìn', 'Phòng Trực Tuyến', 'Phòng Online', 'Phòng cho trẻ'),
+        type: Sequelize.ENUM(
+          'Phòng Nghe Nhìn',
+          'Phòng Trực Tuyến',
+          'Phòng Online',
+          'Phòng cho trẻ'
+        ),
         allowNull: false,
       },
       capacity: {

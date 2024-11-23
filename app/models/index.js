@@ -5,40 +5,96 @@ const Course = require('../models/courseModel');
 const Classroom = require('../models/classroomModel');
 const Teacher = require('../models/teacherModel');
 const Shift = require('../models/shiftModel');
-const TeachersRole = require('../models/teacher_roleModel');
+const ClassTeacher = require('../models/classTeacherModel');
+const ClassSchedule = require('../models/classScheduleModel');
+const TeacherLevel = require('../models/teacher_levelModel');
+const Level = require('../models/levelModel');
+const ScheduleShift = require('../models/schedule_shiftModel');
 
 const setupAssociations = () => {
-    Class.hasMany(Schedule, { foreignKey: 'schedules_id', as: 'schedules' });
-    Schedule.belongsTo(Class, { foreignKey: 'schedules_id', as: 'class' });
-    Classroom.hasMany(Schedule, { foreignKey: 'classroom_id', as: 'schedules' });
-    Schedule.belongsTo(Classroom, { foreignKey: 'classroom_id', as: 'classroom' });
-    Schedule.belongsTo(Shift, { foreignKey: 'shift_id', as: 'shift' });
-    Shift.hasMany(Schedule, { foreignKey: 'shift_id', as: 'schedules' });
-    Class.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
-    Class.belongsTo(Classroom, { foreignKey: 'classroom_id', as: 'classroom' });
-    Class.belongsTo(Teacher, { as: 'MainTeacher', foreignKey: 'cm_main' });
-    Class.belongsTo(Teacher, { as: 'SubTeacher', foreignKey: 'cm_sub' });
+  Classroom.hasMany(Schedule, { foreignKey: 'classroom_id', as: 'schedules' });
+  Schedule.belongsTo(Classroom, {
+    foreignKey: 'classroom_id',
+    as: 'classroom',
+  });
+  Schedule.belongsTo(Shift, { foreignKey: 'shift_id', as: 'shift' });
+  Shift.hasMany(Schedule, { foreignKey: 'shift_id', as: 'schedules' });
+  Class.belongsTo(Course, { foreignKey: 'course_id', as: 'course' });
+  Class.belongsTo(Classroom, { foreignKey: 'classroom_id', as: 'classroom' });
+  Class.belongsToMany(Teacher, {
+    through: ClassTeacher,
+    foreignKey: 'class_id',
+    otherKey: 'teacher_id',
+    as: 'Teachers',
+  });
+
+  Teacher.belongsToMany(Class, {
+    through: ClassTeacher,
+    foreignKey: 'teacher_id',
+    otherKey: 'class_id',
+    as: 'Classes',
+  });
+  Class.belongsToMany(Schedule, {
+    through: ClassSchedule,
+    foreignKey: 'class_id',
+    otherKey: 'schedule_id',
+    as: 'schedules',
+  });
+
+  Schedule.belongsToMany(Class, {
+    through: ClassSchedule,
+    foreignKey: 'schedule_id',
+    otherKey: 'class_id',
+    as: 'classes',
+  });
+  Shift.belongsTo(Class, {
+    foreignKey: 'class_id',
+    as: 'class',
+  });
+  Class.hasMany(Shift, {
+    foreignKey: 'class_id',
+    as: 'shifts',
+  });
+  Teacher.belongsToMany(Level, {
+    through: TeacherLevel,
+    foreignKey: 'teacher_id',
+    otherKey: 'level_id',
+    as: 'levels',
+  });
+
+  Level.belongsToMany(Teacher, {
+    through: TeacherLevel,
+    foreignKey: 'level_id',
+    otherKey: 'teacher_id',
+    as: 'teachers',
+  });
+  Shift.belongsToMany(Schedule, {
+    through: ScheduleShift,
+    foreignKey: 'shift_id',
+    otherKey: 'schedule_id',
+    as: 'shift_schedule',
+  });
+
+  Schedule.belongsToMany(Shift, {
+    through: ScheduleShift,
+    foreignKey: 'schedule_id',
+    otherKey: 'shift_id',
+    as: 'schedule_shift',
+  });
 };
 
 setupAssociations();
 
-// const syncDatabase = async () => {
-//     try {
-//         await sequelize.sync({ alter: false });
-//         console.log('Database synchronized successfully.');
-//     } catch (err) {
-//         console.error('Error synchronizing the database:', err);
-//     }
-// };
-
-// syncDatabase();
-
 module.exports = {
-    Class,
-    Schedule,
-    Course,
-    Classroom,
-    Teacher,
-    Shift,
-    TeachersRole
+  ClassTeacher,
+  Class,
+  Schedule,
+  Course,
+  Classroom,
+  Teacher,
+  Shift,
+  ClassSchedule,
+  TeacherLevel,
+  Level,
+  ScheduleShift
 };

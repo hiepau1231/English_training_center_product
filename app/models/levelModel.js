@@ -1,11 +1,8 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
 
-const Teacher = require('./teacherModel');
-const Level = require('./levelModel');
-
-const TeacherLevel = sequelize.define(
-  'TeacherLevel',
+const Level = sequelize.define(
+  'Level',
   {
     id: {
       type: DataTypes.INTEGER(11),
@@ -13,15 +10,9 @@ const TeacherLevel = sequelize.define(
       autoIncrement: true,
       allowNull: false,
     },
-    level_id: {
-      type: DataTypes.INTEGER(11),
+    level_name: {
+      type: DataTypes.STRING(100),
       allowNull: false,
-      references: { model: Level, key: 'id' },
-    },
-    teacher_id: {
-      type: DataTypes.INTEGER(11),
-      allowNull: true,
-      references: { model: Teacher, key: 'id' },
     },
     created_at: {
       type: DataTypes.DATE,
@@ -45,12 +36,19 @@ const TeacherLevel = sequelize.define(
     },
   },
   {
-    tableName: 'teacher_level',
+    tableName: 'level',
     timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
   }
 );
-
-module.exports = TeacherLevel;
+Level.associate = (models) => {
+  Level.belongsToMany(models.Teacher, {
+    through: models.TeacherLevel,
+    foreignKey: 'level_id',
+    otherKey: 'teacher_id',
+    as: 'teachers',
+  });
+};
+module.exports = Level;

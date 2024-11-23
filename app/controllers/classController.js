@@ -1,9 +1,7 @@
-
 const classService = require('../services/classService');
 const moment = require('moment');
 
 class ClassController {
-
   async getClasses(req, res) {
     try {
       const classes = await classService.getClasses();
