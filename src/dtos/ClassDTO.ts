@@ -11,18 +11,8 @@ export class ClassDTO {
   // Foreign key fields
   classroomId: number | null = null;
   courseId: number | null = null;
-
-  // Relationship IDs
-  assignedTeacherIds: number[] = [];
-  linkedScheduleIds: number[] = [];
-  shiftIds: number[] = [];
-
-  // Optional: Full related entities (if needed)
-  classroom?: any;
-  course?: any;
-  assignedTeachers?: any[];
-  linkedSchedules?: any[];
-  shifts?: any[];
+  classroom: any;
+  course: any;
 
   constructor(
     id: number,
@@ -35,14 +25,9 @@ export class ClassDTO {
     deletedAt: Date | null,
     classroomId: number | null = null,
     courseId: number | null = null,
-    assignedTeacherIds: number[] = [],
-    linkedScheduleIds: number[] = [],
-    shiftIds: number[] = [],
     classroom?: any,
     course?: any,
-    assignedTeachers?: any[],
-    linkedSchedules?: any[],
-    shifts?: any[],
+
   ) {
     this.id = id;
     this.className = className;
@@ -52,19 +37,11 @@ export class ClassDTO {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.deletedAt = deletedAt;
-
     this.classroomId = classroomId;
     this.courseId = courseId;
-
-    this.assignedTeacherIds = assignedTeacherIds;
-    this.linkedScheduleIds = linkedScheduleIds;
-    this.shiftIds = shiftIds;
 
     // Optional: Assign full entities
     this.classroom = classroom;
     this.course = course;
-    this.assignedTeachers = assignedTeachers;
-    this.linkedSchedules = linkedSchedules;
-    this.shifts = shifts;
   }
 }

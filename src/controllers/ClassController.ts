@@ -1,5 +1,5 @@
-// src/controllers/ClassController.ts
 import { Request, Response } from 'express';
+import { ClassDTO } from '../dtos/ClassDTO';
 import { ClassService } from '../services/ClassServices';
 
 export class ClassController {
@@ -33,48 +33,48 @@ export class ClassController {
     }
   }
 
-  // async createClass(req: Request, res: Response) {
-  //   try {
-  //     const classDTO: ClassDTO = req.body;
-  //     const newClass = await this.classService.createClass(classDTO);
-  //     res.status(201).json(newClass);
-  //   } catch (error) {
-  //     res.status(400).json({ message: 'Error creating class', error });
-  //   }
-  // }
+  async createClass(req: Request, res: Response) {
+    try {
+      const classDTO: ClassDTO = req.body;
+      const newClass = await this.classService.createClass(classDTO);
+      res.status(201).json(newClass);
+    } catch (error) {
+      res.status(400).json({ message: 'Error creating class', error });
+    }
+  }
 
-  // async updateClass(req: Request, res: Response) {
-  //   try {
-  //     const classDTO: Partial<ClassDTO> = req.body;
-  //     const classId = Number(req.params.id);
-  //     const classExists = await this.classService.getClassById(classId);
+  async updateClass(req: Request, res: Response) {
+    try {
+      const classDTO: Partial<ClassDTO> = req.body;
+      const classId = Number(req.params.id);
+      const classExists = await this.classService.getClassById(classId);
 
-  //     if (!classExists) {
-  //       return res.status(404).json({ message: 'Class not found' });
-  //     }
+      if (!classExists) {
+        return res.status(404).json({ message: 'Class not found' });
+      }
 
-  //     await this.classService.updateClass(classId, classDTO);
-  //     res.sendStatus(204);
-  //   } catch (error) {
-  //     res.status(400).json({ message: 'Error updating class', error });
-  //   }
-  // }
+     await this.classService.updateClass(classId, classDTO);
+      res.status(200).json({ message: `Update Class with ID ${classId} successfully ! `});
+    } catch (error) {
+      res.status(400).json({ message: 'Error updating class', error });
+    }
+  }
 
-  // async deleteClass(req: Request, res: Response) {
-  //   try {
-  //     const classId = Number(req.params.id);
-  //     const classExists = await this.classService.getClassById(classId);
+  async deleteClass(req: Request, res: Response) {
+    try {
+      const classId = Number(req.params.id);
+      const classExists = await this.classService.getClassById(classId);
 
-  //     if (!classExists) {
-  //       return res.status(404).json({ message: 'Class not found' });
-  //     }
+      if (!classExists) {
+        return res.status(404).json({ message: 'Class not found' });
+      }
 
-  //     await this.classService.deleteClass(classId);
-  //     res.sendStatus(204);
-  //   } catch (error) {
-  //     res.status(500).json({ message: 'Error deleting class', error });
-  //   }
-  // }
+      await this.classService.deleteClass(classId);
+      res.sendStatus(204);
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting class', error });
+    }
+  }
 }
 
 export default ClassController;

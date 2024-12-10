@@ -1,5 +1,6 @@
 
 import { DataSource, DeepPartial, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export abstract class BaseRepository<T extends ObjectLiteral> {
   protected repository: Repository<T>;
@@ -7,14 +8,12 @@ export abstract class BaseRepository<T extends ObjectLiteral> {
   constructor(entity: EntityTarget<T>, dataSource: DataSource) {
     this.repository = dataSource.getRepository(entity);
   }
-
   /**
    * Tìm tất cả bản ghi
    */
   async findAll(): Promise<T[]> {
     return await this.repository.find();
   }
-
   /**
    * Tìm bản ghi theo ID
    */
@@ -23,7 +22,6 @@ export abstract class BaseRepository<T extends ObjectLiteral> {
     return result
     
   }
-
   /**
    * Tạo mới một bản ghi
    */
@@ -31,15 +29,13 @@ export abstract class BaseRepository<T extends ObjectLiteral> {
     const entity = this.repository.create(data);
     return await this.repository.save(entity);
   }
-
   /**
    * Cập nhật bản ghi theo ID
    */
-  async update(id: number, data: DeepPartial<T>): Promise<T | null> {
-    await this.repository.update(id, data);
-    return this.findById(id);
+  async update(id: number, data: QueryDeepPartialEntity<T>): Promise<T | null> {
+      await this.repository.update(id, data);
+      return await this.findById(id);
   }
-
   /**
    * Xóa bản ghi theo ID (soft delete)
    */
