@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "ts-node src/test-connection.ts",
+    "test:repos": "ts-node src/test-repositories.ts",
+    "test:services": "ts-node src/test-services.ts",
+    "test:validation": "ts-node src/test-validation.ts",
+    "test:api": "ts-node src/test-api.ts",
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "db:create": "ts-node src/scripts/create-database.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +21,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.1",
+    "joi": "^17.13.3",
     "mysql2": "^3.11.5",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
@@ -25,7 +32,8 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.1",
-    "dotenv": "^16.4.7",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^6.3.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.2"
