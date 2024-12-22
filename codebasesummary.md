@@ -14,6 +14,15 @@
 - **Xử lý file**: multer, xlsx
 - **Khác**: cors, dotenv
 
+## Quản Lý Source Code
+- **Version Control**: Git
+- **Cấu hình .gitignore**:
+  - Bỏ qua thư mục `node_modules` và `dist`
+  - Không theo dõi file môi trường `.env`
+  - Bỏ qua file logs và cache
+  - Bỏ qua file cấu hình IDE (VS Code, JetBrains)
+  - Bỏ qua file hệ thống (.DS_Store, Thumbs.db)
+
 ## Cấu Trúc Dự Án
 ```
 src/
