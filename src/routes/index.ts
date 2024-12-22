@@ -1,9 +1,14 @@
 import { Router } from 'express';
-import classRouter from './ClassRoute';
+import roomRoutes from './roomRoutes';
+import classRoutes from './ClassRoute';
+import classScheduleRoutes from './classScheduleRoutes';
+import importRoutes from './import.routes';
+
 const router = Router();
 
-router.get('/', (req, res) => {
-    res.json({ message: 'Welcome to the Example Route!' });
-  });
-  router.use('/classes', classRouter);
+router.use('/rooms', roomRoutes);
+router.use('/classes', classRoutes);
+router.use('/schedules', classScheduleRoutes);
+router.use('/import', importRoutes);
+
 export default router;

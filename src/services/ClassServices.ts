@@ -1,5 +1,5 @@
 import { ClassDTO } from '../dtos/ClassDTO';
-import { Class } from '../entities/classEntity';
+import { Class } from '../entities/Class';
 import { ClassRepository } from '../repositories/ClassRepository';
 import { BaseService } from './BaseService';
 
@@ -38,7 +38,18 @@ export class ClassService extends BaseService<Class, ClassDTO> {
    * Cập nhật lớp học theo ID
    */
   async updateClass(id: number, classDTO: Partial<ClassDTO>): Promise<ClassDTO | null> {
-    const updatedClass = await this.classRepository.update(id, classDTO);
+    // Convert DTO to entity format
+    const updateData: any = {
+      ...classDTO,
+      classroom: classDTO.classroomId ? { id: classDTO.classroomId } : undefined,
+      course: classDTO.courseId ? { id: classDTO.courseId } : undefined
+    };
+
+    // Remove foreign key fields that TypeORM doesn't expect
+    delete updateData.classroomId;
+    delete updateData.courseId;
+
+    const updatedClass = await this.classRepository.update(id, updateData);
     return updatedClass ? this.toDTO(updatedClass) : null;
   }
   /**

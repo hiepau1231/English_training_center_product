@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Class } from './classEntity';
+import { Class } from './Class';
 import { Classroom } from './classroomEntity';
 import { ClassSchedule } from './classScheduleEntity';
 import { ClassTeacher } from './classTeacherEntity';

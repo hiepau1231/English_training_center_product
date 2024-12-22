@@ -1,7 +1,6 @@
-
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../config/database';
-import { Class } from '../entities/classEntity';
+import { Class } from '../entities/Class';
 import { BaseRepository } from './BaseRepository';
 
 export class ClassRepository extends BaseRepository<Class> {

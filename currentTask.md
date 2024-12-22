@@ -1,161 +1,126 @@
-# Yêu cầu chức năng
+# Current Task - Nâng cấp API Thông Tin Phòng Học
 
-## 1. Xem số lớp đang dạy trong ngày
-- **API Endpoint**: `GET /api/classes/daily`
-- **Input**: 
-  - Ngày (date)
-- **Output**:
-  - Tổng số lớp đang dạy
-  - Danh sách các lớp với thông tin cơ bản
+## Phân tích Database Hiện Tại
 
-## 2. Xem thông tin chi tiết phòng học
-- **API Endpoint**: `GET /api/rooms/:roomId/schedule`
-- **Input**:
-  - ID phòng học
-  - Ngày (date)
-- **Output**:
-  - Thông tin giáo viên
-    - Tên giáo viên
-    - Cấp độ giáo viên
-  - Thông tin phòng học
-    - Số phòng
-  - Thông tin ca dạy
-    - Giờ bắt đầu
-    - Giờ kết thúc
-  - Thông tin khóa học
-    - Tên khóa học
-    - Cấp độ
+### 1. Cấu trúc Database
+1. Bảng Chính:
+   - `classrooms`: Thông tin phòng học (id, classroom_name, capacity, type, status)
+   - `classes`: Thông tin lớp học (id, class_name, course_id, classroom_id, start_date, end_date)
+   - `teachers`: Thông tin giáo viên (id, teacher_name, is_foreign, is_Fulltime, is_Parttime)
+   - `shifts`: Ca học (id, teaching_shift, class_id)
+   - `schedules`: Lịch học (id, classroom_id)
+   - `class_schedules`: Liên kết lớp và lịch học (class_id, schedule_id)
+   - `class_teachers`: Liên kết giáo viên và lớp học
 
-## 3. Thay thế giáo viên
-- **API Endpoint**: `PUT /api/classes/:classId/replace-teacher`
-- **Input**:
-  - ID lớp học
-  - ID giáo viên mới (phải cùng cấp độ)
-- **Output**:
-  - Thông tin cập nhật sau khi thay thế
-  - Thông báo thành công/thất bại
+2. Bảng Phụ:
+   - `teacher_level`: Cấp độ giáo viên
+   - `teacher_working_type`: Loại hình làm việc
+   - `courses`: Thông tin khóa học
+   - `attendance`: Điểm danh
 
-## 4. Thay đổi phòng học
-- **API Endpoint**: `PUT /api/classes/:classId/replace-room`
-- **Input**:
-  - ID lớp học
-  - ID phòng học mới
-- **Output**:
-  - Th��ng tin cập nhật sau khi thay đổi
-  - Thông báo thành công/thất bại
+### 2. Mối quan hệ hiện có:
+- Classroom (1) - (n) Classes
+- Class (1) - (n) Class_Schedules
+- Teacher (1) - (n) Class_Teachers
+- Class (1) - (n) Shifts
 
-## 5. Thay đổi giờ dạy
-- **API Endpoint**: `PUT /api/classes/:classId/reschedule`
-- **Input**:
-  - ID lớp học
-  - Thời gian mới (startTime, endTime)
-- **Output**:
-  - Thông tin cập nhật sau khi thay đổi
-  - Thông báo thành công/thất bại
+## User Flow
 
-# User Flow
+### 1. Upload Danh Sách Lớp Học
+1. Admin upload file Excel chứa thông tin lớp học
+2. Hệ thống đọc và validate dữ liệu từ file Excel:
+   - Kiểm tra định dạng thời gian học
+   - Validate tên lớp theo quy tắc (phải bắt đầu bằng tên khóa học)
+   - Kiểm tra sức chứa phòng học
+3. Hệ thống tạo/cập nhật dữ liệu vào các bảng:
+   - Tạo/cập nhật classroom
+   - Tạo/cập nhật class và course
+   - Tạo/cập nhật shifts (ca học)
+   - Tạo/cập nhật class_teachers
+4. Trả về kết quả import
 
-1. **Xem lớp học trong ngày**
-   ```mermaid
-   flowchart TD
-   A[User] --> B[Chọn ngày]
-   B --> C[Gửi request GET /api/classes/daily]
-   C --> D[Hiển thị danh sách lớp]
-   ```
+### 2. Xem Thông Tin Phòng Học
+1. User chọn xem thông tin phòng học
+2. Hệ thống trả về thông tin chi tiết:
+   - Thông tin phòng: tên, sức chứa, loại phòng
+   - Danh sách lớp học hiện tại
+   - Lịch sử sử dụng (từ bảng schedules)
+   - Thông tin giáo viên (từ bảng class_teachers)
 
-2. **Xem chi tiết phòng học**
-   ```mermaid
-   flowchart TD
-   A[User] --> B[Chọn phòng học]
-   B --> C[Chọn ngày]
-   C --> D[Gửi request GET /api/rooms/:roomId/schedule]
-   D --> E[Hiển thị thông tin chi tiết]
-   ```
+### 3. Tìm Kiếm và Lọc
+1. User có thể tìm kiếm theo:
+   - Mã/tên phòng (classroom_name)
+   - Thời gian (từ bảng shifts)
+   - Giáo viên (từ bảng teachers)
+   - Khóa học (từ bảng courses)
+2. Hệ thống query và trả về kết quả
 
-3. **Thay thế giáo viên**
-   ```mermaid
-   flowchart TD
-   A[User] --> B[Chọn lớp học]
-   B --> C[Xem danh sách giáo viên cùng cấp độ]
-   C --> D[Chọn giáo viên thay thế]
-   D --> E[Gửi request PUT /api/classes/:classId/replace-teacher]
-   E --> F[Cập nhật thành công]
-   ```
+## Tasks đã hoàn thành
 
-4. **Thay đổi phòng học**
-   ```mermaid
-   flowchart TD
-   A[User] --> B[Chọn lớp học]
-   B --> C[Xem danh sách phòng trống]
-   C --> D[Chọn phòng mới]
-   D --> E[Gửi request PUT /api/classes/:classId/replace-room]
-   E --> F[Cập nhật thành công]
-   ```
+1. Database:
+   - [x] Thêm trường type vào bảng classrooms
+   - [x] Thêm trường student_count vào bảng classes
 
-5. **Thay đổi giờ dạy**
-   ```mermaid
-   flowchart TD
-   A[User] --> B[Chọn lớp học]
-   B --> C[Chọn thời gian mới]
-   C --> D[Kiểm tra xung đột]
-   D --> E[Gửi request PUT /api/classes/:classId/reschedule]
-   E --> F[Cập nhật thành công]
-   ```
+2. Entities:
+   - [x] Cập nhật ClassroomEntity:
+     - [x] Thêm relationship với Classes
+     - [x] Thêm relationship với Schedules
+   - [x] Cập nhật ClassEntity:
+     - [x] Thêm relationship với Teachers (qua class_teachers)
+     - [x] Thêm relationship với Schedules (qua class_schedules)
 
-# Database Schema
+3. Repositories:
+   - [x] ClassroomRepository:
+     - [x] Thêm method tìm kiếm phòng theo nhiều tiêu chí
+     - [x] Thêm method lấy lịch sử sử dụng phòng
+   - [x] ClassTeacherRepository:
+     - [x] Thêm method lấy danh sách giáo viên theo phòng/lớp
+   - [x] ScheduleRepository:
+     - [x] Thêm method quản lý lịch học theo phòng
 
-## Entities cần thiết:
+4. Services:
+   - [x] ClassroomService:
+     - [x] Xử lý logic tìm kiếm phòng
+     - [x] Xử lý logic cập nhật thông tin phòng
+   - [x] ImportService:
+     - [x] Xử lý import data từ Excel
+     - [x] Validate dữ liệu theo business rules
 
-1. **Teacher**
-   - id
-   - name
-   - levelId
-   - status
-   - createdAt
-   - updatedAt
+5. Controllers:
+   - [x] RoomController:
+     - [x] API lấy thông tin chi tiết phòng
+     - [x] API tìm kiếm phòng
+     - [x] API cập nhật thông tin phòng
+   - [x] ImportController:
+     - [x] API upload file Excel
+     - [x] API xem kết quả import
 
-2. **TeacherLevel**
-   - id
-   - name
-   - description
-   - createdAt
-   - updatedAt
+## Tasks cần thực hiện tiếp
 
-3. **Room**
-   - id
-   - roomNumber
-   - capacity
-   - status
-   - createdAt
-   - updatedAt
+1. Database:
+   - [ ] Thêm các index cho tối ưu query:
+     - [ ] Index cho các trường thường xuyên tìm kiếm
+     - [ ] Index cho các khóa ngoại
+     - [ ] Index cho các trường thời gian
 
-4. **Course**
-   - id
-   - name
-   - levelId
-   - description
-   - createdAt
-   - updatedAt
+2. Testing và Documentation:
+   - [ ] Thêm unit tests cho các service
+   - [ ] Thêm integration tests cho các API
+   - [ ] Cập nhật tài liệu API cho các endpoint mới
+   - [ ] Thêm monitoring hiệu năng
 
-5. **ClassSchedule**
-   - id
-   - courseId
-   - teacherId
-   - roomId
-   - date
-   - startTime
-   - endTime
-   - status
-   - createdAt
-   - updatedAt
+3. Tối ưu hóa:
+   - [ ] Tối ưu các câu query phức tạp
+   - [ ] Thêm caching cho các data thường xuyên truy xuất
+   - [ ] Xử lý các edge case và error handling
 
-# Các bước triển khai
+4. Security:
+   - [ ] Thêm validation cho input
+   - [ ] Xử lý các vấn đề bảo mật
+   - [ ] Rate limiting cho các API
 
-1. [ ] Tạo các Entity với TypeORM
-2. [ ] Tạo Repository cho mỗi Entity
-3. [ ] Tạo Service layer với business logic
-4. [ ] Tạo Controller với các endpoint API
-5. [ ] Tạo Routes và Middleware
-6. [ ] Viết validation và error handling
-7. [ ] Testing các API endpoint
-8. [ ] Documentation API 
+## Ưu tiên thực hiện
+1. Thêm indexes cho Database
+2. Hoàn thiện Testing
+3. Tối ưu Performance
+4. Tăng cường Security

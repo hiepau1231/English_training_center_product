@@ -1,0 +1,6 @@
+Room Number,Capacity,Status
+A101,20,available
+A102,25,occupied
+A103,30,maintenance
+A104,15,available
+A105,35,available 

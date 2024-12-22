@@ -1,4 +1,3 @@
-
 import { DataSource, DeepPartial, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
@@ -33,8 +32,13 @@ export abstract class BaseRepository<T extends ObjectLiteral> {
    * Cập nhật bản ghi theo ID
    */
   async update(id: number, data: QueryDeepPartialEntity<T>): Promise<T | null> {
+    try {
       await this.repository.update(id, data);
       return await this.findById(id);
+    } catch (error) {
+      console.error('Error updating entity:', error);
+      return null;
+    }
   }
   /**
    * Xóa bản ghi theo ID (soft delete)

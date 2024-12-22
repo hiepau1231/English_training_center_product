@@ -1,48 +1,37 @@
 import { Router } from 'express';
 import { ClassScheduleController } from '../controllers/ClassScheduleController';
-import { validateRequest } from '../middleware/validateRequest';
-import { 
-    replaceTeacherSchema, 
-    replaceRoomSchema, 
-    rescheduleClassSchema 
-} from '../validations/classScheduleValidation';
-import { catchAsync } from '../utils/AppError';
 
 const router = Router();
 const classScheduleController = new ClassScheduleController();
 
-// Get daily schedules
-router.get('/daily', catchAsync(classScheduleController.getDailySchedules));
+// Xem lịch dạy trong ngày
+router.get('/daily', classScheduleController.getDailySchedules.bind(classScheduleController));
 
-// Get schedule details
-router.get('/:id', catchAsync(classScheduleController.getScheduleDetails));
+// Xem chi tiết lịch học
+router.get('/:id', classScheduleController.getScheduleDetails.bind(classScheduleController));
 
-// Replace teacher
-router.put('/:id/replace-teacher', 
-    validateRequest(replaceTeacherSchema),
-    catchAsync(classScheduleController.replaceTeacher)
-);
+// Thay thế giáo viên
+router.put('/:id/replace-teacher', classScheduleController.replaceTeacher.bind(classScheduleController));
 
-// Replace room
-router.put('/:id/replace-room', 
-    validateRequest(replaceRoomSchema),
-    catchAsync(classScheduleController.replaceRoom)
-);
+// Thay đổi phòng học
+router.put('/:id/replace-room', classScheduleController.replaceRoom.bind(classScheduleController));
 
-// Reschedule class
-router.put('/:id/reschedule', 
-    validateRequest(rescheduleClassSchema),
-    catchAsync(classScheduleController.rescheduleClass)
-);
+// Thay đổi thời gian học
+router.put('/:id/reschedule', classScheduleController.rescheduleClass.bind(classScheduleController));
 
-// Find available replacement teachers
-router.get('/:id/available-teachers', 
-    catchAsync(classScheduleController.findAvailableTeachers)
-);
+// Tìm giáo viên có thể thay thế
+router.get('/:id/available-teachers', classScheduleController.findAvailableTeachers.bind(classScheduleController));
 
-// Find available replacement rooms
-router.get('/available-rooms', 
-    catchAsync(classScheduleController.findAvailableRooms)
-);
+// Tạo lịch học tự động
+router.post('/generate', classScheduleController.generateSchedules.bind(classScheduleController));
+
+// Kiểm tra xung đột lịch học
+router.get('/conflicts', classScheduleController.checkConflicts.bind(classScheduleController));
+
+// Giải quyết xung đột lịch học
+router.post('/resolve-conflicts', classScheduleController.resolveConflicts.bind(classScheduleController));
+
+// Xem thống kê lịch học
+router.get('/statistics', classScheduleController.getStatistics.bind(classScheduleController));
 
 export default router; 

@@ -6,14 +6,18 @@ import { TeacherLevel } from '../entities/TeacherLevel';
 import { Room } from '../entities/Room';
 import { Course } from '../entities/Course';
 import { ClassSchedule } from '../entities/ClassSchedule';
+import dotenv from 'dotenv';
+
+// Load .env file
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT) || 3306,
-  username: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'english_training_center',
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
   entities: [

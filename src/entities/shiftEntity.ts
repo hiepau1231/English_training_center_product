@@ -6,7 +6,7 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Class } from './classEntity';
+import { Class } from './Class';
 import { Schedule } from './scheduleEntity';
 
 @Entity('shifts') // Tên bảng giữ nguyên

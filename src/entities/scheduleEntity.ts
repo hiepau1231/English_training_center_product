@@ -9,7 +9,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Class } from './classEntity';
+import { Class } from './Class';
 import { Classroom } from './classroomEntity';
 import { Shift } from './shiftEntity';
 

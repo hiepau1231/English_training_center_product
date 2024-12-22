@@ -1,21 +1,21 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { Teacher } from "./Teacher";
 
-@Entity()
+@Entity('teacher_levels')
 export class TeacherLevel {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column()
-    name!: string;
+    @Column({ name: 'level_name' })
+    levelName!: string;
 
     @Column({ type: 'text', nullable: true })
     description!: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at' })
     createdAt!: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ name: 'updated_at' })
     updatedAt!: Date;
 
     @OneToMany(() => Teacher, teacher => teacher.level)

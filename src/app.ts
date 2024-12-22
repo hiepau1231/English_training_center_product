@@ -1,35 +1,20 @@
-import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { AppDataSource } from './config/database';
+import morgan from 'morgan';
 import classScheduleRoutes from './routes/classScheduleRoutes';
-import { errorHandler } from './middleware/errorHandler';
-import { AppError } from './utils/AppError';
+import roomRoutes from './routes/roomRoutes';
+import importRoutes from './routes/import.routes';
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Initialize database connection
-AppDataSource.initialize()
-    .then(() => {
-        console.log('Database connection initialized');
-    })
-    .catch((error) => {
-        console.error('Error initializing database connection:', error);
-    });
+app.use(morgan('dev'));
 
 // Routes
-app.use('/api/classes', classScheduleRoutes);
+app.use('/api/class-schedules', classScheduleRoutes);
+app.use('/api/rooms', roomRoutes);
+app.use('/api/import', importRoutes);
 
-// Handle undefined routes
-app.all('*', (req, res, next) => {
-    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
-});
-
-// Error handling middleware
-app.use(errorHandler);
-
-export default app;
+export default app; 
