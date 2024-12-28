@@ -8,7 +8,7 @@ const router = Router();
 
 router.use('/rooms', roomRoutes);
 router.use('/classes', classRoutes);
-router.use('/schedules', classScheduleRoutes);
+router.use('/class-schedules', classScheduleRoutes);
 router.use('/import', importRoutes);
 
 export default router;

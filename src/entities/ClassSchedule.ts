@@ -8,11 +8,11 @@ import {
     JoinColumn,
     DeleteDateColumn
 } from 'typeorm';
-import { Room } from './Room';
 import { Teacher } from './Teacher';
 import { Course } from './Course';
 import { Class } from './Class';
 import { Shift } from './Shift';
+import { Room } from './Room';
 
 @Entity('class_schedules')
 export class ClassSchedule {
@@ -36,6 +36,28 @@ export class ClassSchedule {
 
     @Column({ name: 'teacher_id' })
     teacherId!: number;
+
+    @Column({ name: 'time' })
+    time!: string;
+
+    @Column({ name: 'course_name' })
+    courseName!: string;
+
+    @Column({ name: 'class_name' })
+    className!: string;
+
+    @Column({ name: 'main_teacher' })
+    mainTeacher!: string;
+
+    @Column({ name: 'number_of_students' })
+    numberOfStudents!: number;
+
+    @Column({ name: 'start_date', type: 'date' })
+    startDate!: Date;
+
+    @Column({ name: 'end_date', type: 'date' })
+    endDate!: Date;
+
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt!: Date;
@@ -74,4 +96,4 @@ export class ClassSchedule {
             Object.assign(this, partial);
         }
     }
-} 
+}

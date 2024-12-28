@@ -19,6 +19,69 @@ Lấy danh sách tất cả các phòng học.
 GET /rooms
 ```
 
+**Response**:
+```json
+[
+    {
+        "id": 1,
+        "roomNumber": "P001",
+        "capacity": 30,
+        "type": "Phong Online",
+        "status": false
+    }
+]
+
+#### Kiểm tra tình trạng phòng
+Kiểm tra phòng có sẵn trong khoảng thời gian nhất định
+
+```http
+GET /rooms/{id}/availability
+```
+
+**Parameters**:
+- startDate (required): YYYY-MM-DD
+- endDate (required): YYYY-MM-DD
+
+**Response**:
+```json
+{
+    "isAvailable": true
+}
+
+### Lịch Học
+
+#### Lấy lịch học theo ngày
+Lấy danh sách lịch học trong một ngày cụ thể
+
+```http
+GET /class-schedules/daily
+```
+
+**Parameters**:
+- date (required): YYYY-MM-DD
+
+**Response**:
+```json
+{
+    "totalClasses": 0,
+    "schedules": []
+}
+
+### Import Dữ Liệu
+
+#### Tải template import phòng học
+Tải file Excel mẫu để import phòng học
+
+```http
+GET /import/templates/room
+```
+
+**Response**: File Excel download
+
+### API cần bổ sung
+- /api/teachers
+- /api/courses
+
 **Phản hồi:**
 ```json
 [
@@ -125,7 +188,7 @@ GET /rooms/:id/availability?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
 
 **Tham số:**
 - `id` (path) - ID của phòng học
-- `startDate` (query) - Ngày bắt đầu (định dạng: YYYY-MM-DD)
+- `startDate` (query) - Ngày bắt đầu (định d���ng: YYYY-MM-DD)
 - `endDate` (query) - Ngày kết thúc (định dạng: YYYY-MM-DD)
 
 **Phản hồi:**
@@ -291,90 +354,101 @@ File Excel mẫu với các cột:
 
 ### Lịch Học
 
-#### Xem Lịch Dạy Trong Ngày
-Lấy tất cả lịch học trong một ngày cụ thể.
+#### Xem Lịch Học Trong Ngày
+Lấy danh sách lịch học trong một ngày cụ thể.
 
 ```http
 GET /class-schedules/daily?date=YYYY-MM-DD
 ```
 
 **Tham số:**
-- `date` (query) - Ngày cần xem lịch (định dạng: YYYY-MM-DD)
+- `date` (query, required) - Ngày cần xem lịch (định dạng: YYYY-MM-DD)
 
-**Phản hồi:**
+**Phản hồi thành công:**
 ```json
 {
   "totalClasses": 1,
   "schedules": [
     {
       "id": 1,
+      "classId": 1,
+      "scheduleDate": "2024-03-19",
+      "shiftId": 1,
       "courseId": 1,
-      "teacherId": 1,
       "roomId": 1,
-      "date": "2024-03-19",
-      "startTime": "09:00:00",
-      "endTime": "10:30:00",
-      "status": "scheduled",
+      "teacherId": 1,
       "teacher": {
         "id": 1,
-        "name": "Nguyễn Văn A",
-        "levelId": 1,
-        "status": "active"
+        "teacherName": "John Doe",
+        "email": "john@example.com",
+        "experience": "2 years",
+        "isFulltime": true,
+        "level": {
+          "id": 1,
+          "levelName": "Senior",
+          "description": "Over 3 years experience"
+        }
       },
       "room": {
         "id": 1,
-        "roomNumber": "A101",
-        "capacity": 20,
-        "status": "available"
+        "classroomName": "Room 101",
+        "capacity": 30,
+        "type": "Theory"
       },
       "course": {
         "id": 1,
-        "name": "Tiếng Anh Giao Tiếp",
-        "levelId": 1,
-        "description": "Khóa học giao tiếp nâng cao"
+        "courseName": "English Basic 1",
+        "status": "Active"
+      },
+      "shift": {
+        "id": 1,
+        "teachingShift": "Morning",
+        "startTime": "08:00",
+        "endTime": "10:00"
+      },
+      "class": {
+        "id": 1,
+        "className": "Basic 1 - Morning",
+        "startDate": "2024-03-01",
+        "endDate": "2024-05-01",
+        "numberOfStudents": 25
       }
     }
   ]
 }
 ```
 
-#### Tìm Phòng Học Khả Dụng
-Tìm các phòng học khả dụng trong một khoảng thời gian cụ thể.
-
-```http
-GET /class-schedules/available-rooms?date=YYYY-MM-DD&startTime=HH:mm&endTime=HH:mm&minCapacity=N
-```
-
-**Tham số:**
-- `date` (query) - Ngày cần tìm (định dạng: YYYY-MM-DD)
-- `startTime` (query) - Thời gian bắt đầu (định dạng: HH:mm)
-- `endTime` (query) - Thời gian kết thúc (định dạng: HH:mm)
-- `minCapacity` (query, optional) - Sức chứa tối thiểu của phòng
-
-**Phản hồi:**
+**Phản hồi lỗi:**
 ```json
 {
-  "availableRooms": [
-    {
-      "id": 1,
-      "roomNumber": "A101",
-      "capacity": 20,
-      "status": "available"
-    }
-  ]
+  "success": false,
+  "message": "Invalid date format. Use YYYY-MM-DD",
+  "error": "..."
 }
 ```
 
-#### Thay Thế Giáo Viên
-Thay thế giáo viên cho một lịch học cụ thể.
+#### Xem Chi Tiết Lịch Học
+Lấy thông tin chi tiết của một lịch học.
 
 ```http
-PUT /class-schedules/:id/replace-teacher
+GET /class-schedules/:id
 ```
 
 **Tham số:**
-- `id` (path) - ID của lịch học
-- `newTeacherId` (body) - ID của giáo viên mới
+- `id` (path, required) - ID của lịch học
+
+**Phản hồi:** Tương tự như một phần tử trong mảng schedules ở trên
+
+#### Thay Đổi Giáo Viên
+Thay đổi giáo viên cho một lịch học.
+
+```http
+PUT /class-schedules/:id/teacher
+Content-Type: application/json
+```
+
+**Tham số:**
+- `id` (path, required) - ID của lịch học
 
 **Request Body:**
 ```json
@@ -383,36 +457,18 @@ PUT /class-schedules/:id/replace-teacher
 }
 ```
 
-**Phản hồi:**
-```json
-{
-  "id": 1,
-  "courseId": 1,
-  "teacherId": 2,
-  "roomId": 1,
-  "date": "2024-12-19",
-  "startTime": "09:00:00",
-  "endTime": "10:30:00",
-  "status": "scheduled",
-  "teacher": {
-    "id": 2,
-    "name": "Trần Thị B",
-    "levelId": 1,
-    "status": "busy"
-  }
-}
-```
+**Phản hồi:** Trả về lịch học đã được cập nhật
 
 #### Thay Đổi Phòng Học
-Thay đổi phòng học cho một lịch học cụ thể.
+Thay đổi phòng học cho một lịch học.
 
 ```http
-PUT /class-schedules/:id/replace-room
+PUT /class-schedules/:id/room
+Content-Type: application/json
 ```
 
 **Tham số:**
-- `id` (path) - ID của lịch học
-- `newRoomId` (body) - ID của phòng học mới
+- `id` (path, required) - ID của lịch học
 
 **Request Body:**
 ```json
@@ -421,87 +477,126 @@ PUT /class-schedules/:id/replace-room
 }
 ```
 
-**Phản hồi:**
-```json
-{
-  "id": 1,
-  "courseId": 1,
-  "teacherId": 1,
-  "roomId": 2,
-  "date": "2024-12-19",
-  "startTime": "09:00:00",
-  "endTime": "10:30:00",
-  "status": "scheduled",
-  "room": {
-    "id": 2,
-    "roomNumber": "B201",
-    "capacity": 25,
-    "status": "occupied"
-  }
-}
-```
+**Phản hồi:** Trả về lịch học đã được cập nhật
 
 #### Thay Đổi Thời Gian Học
-Thay đổi thời gian cho một lịch học cụ thể.
+Thay đổi thời gian học.
 
 ```http
-PUT /class-schedules/:id/reschedule
+PUT /class-schedules/:id/time
+Content-Type: application/json
 ```
 
 **Tham số:**
-- `id` (path) - ID của lịch học
-- `startTime` (body) - Thời gian bắt đầu mới (định dạng: "HH:mm")
-- `endTime` (body) - Thời gian kết thúc mới (định dạng: "HH:mm")
+- `id` (path, required) - ID của lịch học
 
 **Request Body:**
 ```json
 {
-  "startTime": "10:00",
-  "endTime": "11:30"
+  "startTime": "10:15",
+  "endTime": "12:15"
+}
+```
+
+**Phản hồi:** Trả về lịch học đã được cập nhật
+
+#### Tìm Giáo Viên Có Thể Thay Thế
+Tìm danh sách giáo viên có thể thay thế cho một lịch học.
+
+```http
+GET /class-schedules/:id/available-teachers
+```
+
+**Tham số:**
+- `id` (path, required) - ID của lịch học
+
+**Request Body:**
+```json
+{
+  "date": "2024-03-19",
+  "startTime": "08:00",
+  "endTime": "10:00"
 }
 ```
 
 **Phản hồi:**
 ```json
 {
-  "id": 1,
-  "courseId": 1,
-  "teacherId": 1,
-  "roomId": 1,
-  "date": "2024-12-19",
-  "startTime": "10:00:00",
-  "endTime": "11:30:00",
-  "status": "scheduled"
+  "availableTeachers": [
+    {
+      "id": 2,
+      "teacherName": "Jane Smith",
+      "email": "jane@example.com",
+      "experience": "3 years",
+      "level": {
+        "levelName": "Senior"
+      }
+    }
+  ]
 }
 ```
 
-### Quản Lý Lịch Học Tự Động
+#### Tìm Phòng Trống
+Tìm phòng học trống trong một khoảng thời gian.
+
+```http
+GET /class-schedules/available-rooms?date=YYYY-MM-DD&startTime=HH:mm&endTime=HH:mm&minCapacity=number
+```
+
+**Tham số:**
+- `date` (query, required) - Ngày cần tìm (YYYY-MM-DD)
+- `startTime` (query, required) - Giờ bắt đầu (HH:mm)
+- `endTime` (query, required) - Giờ kết thúc (HH:mm)
+- `minCapacity` (query, optional) - Sức chứa tối thiểu
+
+**Phản hồi:**
+```json
+{
+  "availableRooms": [
+    {
+      "id": 3,
+      "classroomName": "Room 103",
+      "capacity": 35,
+      "type": "Theory"
+    }
+  ]
+}
+```
 
 #### Tạo Lịch Học Tự Động
-Tự động tạo lịch học cho các lớp dựa trên các ràng buộc và quy tắc.
+Tạo lịch học tự động cho một lớp.
 
 ```http
 POST /class-schedules/generate
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "classId": 1,
+  "startDate": "2024-03-01",
+  "endDate": "2024-05-01",
+  "preferredTeachers": [1, 2],
+  "preferredRooms": [1, 2],
+  "preferredShifts": [1, 2]
+}
 ```
 
 **Phản hồi:**
 ```json
 {
-  "message": "Đã tạo lịch học thành công",
-  "details": {
-    "totalClasses": 150,
-    "schedulesCreated": {
-      "regular": 15,
-      "tutorial": 10,
-      "minispeaking": 5
-    },
-    "conflicts": 0
+  "status": "success",
+  "data": {
+    "generatedSchedules": [
+      // Mảng các lịch học đã được tạo
+    ]
   }
 }
 ```
 
-#### Kiểm Tra Xung Đột Lịch Học
-Kiểm tra và hiển thị các xung đột lịch học hiện tại.
+#### Kiểm Tra Xung Đột
+Kiểm tra xung đột lịch học.
 
 ```http
 GET /class-schedules/conflicts
@@ -510,68 +605,54 @@ GET /class-schedules/conflicts
 **Phản hồi:**
 ```json
 {
-  "conflicts": [
-    {
-      "room": {
-        "id": 1,
-        "roomNumber": "201"
-      },
-      "date": "2024-03-20",
-      "shift": {
-        "id": 1,
-        "name": "Ca sáng"
-      },
-      "classes": [
-        {
-          "id": 1,
-          "className": "KET 5J - 2407"
-        },
-        {
-          "id": 2,
-          "className": "PET 5B - 2407"
-        }
-      ]
-    }
-  ],
-  "totalConflicts": 1
+  "status": "success",
+  "data": {
+    "conflicts": [
+      {
+        "type": "TEACHER_OVERLAP",
+        "scheduleId1": 1,
+        "scheduleId2": 2,
+        "description": "Teacher has overlapping classes"
+      }
+    ]
+  }
 }
 ```
 
-#### Giải Quyết Xung Đột Lịch Học
-Tự động giải quyết các xung đột lịch học bằng cách điều chỉnh phòng học ho��c thời gian.
+#### Giải Quyết Xung Đột
+Giải quyết xung đột lịch học.
 
 ```http
 POST /class-schedules/resolve-conflicts
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "conflictId": 1,
+  "resolution": {
+    "type": "CHANGE_TEACHER",
+    "scheduleId": 1,
+    "newTeacherId": 3
+  }
+}
 ```
 
 **Phản hồi:**
 ```json
 {
-  "message": "Đã giải quyết xung đột lịch học",
-  "resolved": [
-    {
-      "originalSchedule": {
-        "classId": 1,
-        "className": "KET 5J - 2407",
-        "roomId": 1,
-        "date": "2024-03-20",
-        "shiftId": 1
-      },
-      "newSchedule": {
-        "classId": 1,
-        "className": "KET 5J - 2407",
-        "roomId": 2,
-        "date": "2024-03-20",
-        "shiftId": 1
-      }
-    }
-  ],
-  "remainingConflicts": 0
+  "status": "success",
+  "data": {
+    "resolvedConflicts": [
+      // Mảng các xung đột đã được giải quyết
+    ]
+  }
 }
 ```
 
-#### Xem Thống Kê Lịch Học
-Xem thống kê về số buổi học của các lớp.
+#### Xem Thống Kê
+Lấy thống kê về lịch học.
 
 ```http
 GET /class-schedules/statistics
@@ -580,32 +661,23 @@ GET /class-schedules/statistics
 **Phản hồi:**
 ```json
 {
-  "statistics": {
-    "byClassType": {
-      "regular": {
-        "totalClasses": 50,
-        "averageSessionsPerClass": 15,
-        "completedClasses": 45
-      },
-      "tutorial": {
-        "totalClasses": 30,
-        "averageSessionsPerClass": 10,
-        "completedClasses": 28
-      },
-      "minispeaking": {
-        "totalClasses": 20,
-        "averageSessionsPerClass": 5,
-        "completedClasses": 20
+  "status": "success",
+  "data": {
+    "totalSchedules": 100,
+    "activeSchedules": 80,
+    "completedSchedules": 20,
+    "teacherStats": {
+      "mostAssigned": {
+        "teacherId": 1,
+        "teacherName": "John Doe",
+        "scheduleCount": 20
       }
     },
-    "byRoom": {
-      "201": {
-        "totalSessions": 59,
-        "utilization": "85%"
-      },
-      "202": {
-        "totalSessions": 56,
-        "utilization": "80%"
+    "roomStats": {
+      "mostUsed": {
+        "roomId": 1,
+        "roomName": "Room 101",
+        "useCount": 30
       }
     }
   }

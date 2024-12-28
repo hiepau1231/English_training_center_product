@@ -1,33 +1,51 @@
 "use strict";
-// import {
-//   CreateDateColumn,
-//   DeleteDateColumn,
-//   Entity,
-//   ManyToOne,
-//   PrimaryGeneratedColumn,
-//   UpdateDateColumn
-// } from 'typeorm';
-// import { Schedule } from './scheduleEntity';
-// import { Shift } from './shiftEntity';
-// @Entity('schedule_shifts')
-// export class ScheduleShift {
-//   @PrimaryGeneratedColumn()
-//   id!: number;
-//   @ManyToOne(() => Schedule, (schedule) => schedule.shifts, {
-//     onDelete: 'CASCADE',
-//     onUpdate: 'CASCADE',
-//   })
-//   associatedSchedule!: Schedule;
-//   @ManyToOne(() => Shift, (shift) => shift.shifts, {
-//     onDelete: 'CASCADE',
-//     onUpdate: 'CASCADE',
-//   })
-//   associatedShift!: Shift;
-//   @CreateDateColumn({ name: 'created_at' })
-//   createdAt!: Date;
-//   @UpdateDateColumn({ name: 'updated_at' })
-//   updatedAt!: Date;
-//   @DeleteDateColumn({ name: 'deleted_at' })
-//   deletedAt!: Date;
-// }
-//# sourceMappingURL=scheduleShiftEntity.js.map
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ScheduleShift = void 0;
+const typeorm_1 = require("typeorm");
+const scheduleEntity_1 = require("./scheduleEntity");
+const shiftEntity_1 = require("./shiftEntity");
+let ScheduleShift = class ScheduleShift {
+};
+exports.ScheduleShift = ScheduleShift;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], ScheduleShift.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => scheduleEntity_1.Schedule, (schedule) => schedule.shifts, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    }),
+    __metadata("design:type", scheduleEntity_1.Schedule)
+], ScheduleShift.prototype, "associatedSchedule", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => shiftEntity_1.Shift, (shift) => shift.shifts, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    }),
+    __metadata("design:type", shiftEntity_1.Shift)
+], ScheduleShift.prototype, "associatedShift", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
+    __metadata("design:type", Date)
+], ScheduleShift.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)({ name: 'updated_at' }),
+    __metadata("design:type", Date)
+], ScheduleShift.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.DeleteDateColumn)({ name: 'deleted_at' }),
+    __metadata("design:type", Date)
+], ScheduleShift.prototype, "deletedAt", void 0);
+exports.ScheduleShift = ScheduleShift = __decorate([
+    (0, typeorm_1.Entity)('schedule_shifts')
+], ScheduleShift);

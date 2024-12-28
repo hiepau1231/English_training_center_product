@@ -32,8 +32,41 @@ export class ClassScheduleRepository extends Repository<ClassSchedule> {
             .leftJoinAndSelect('schedule.room', 'room')
             .leftJoinAndSelect('schedule.course', 'course')
             .leftJoinAndSelect('schedule.shift', 'shift')
-            .where('schedule.scheduleDate = :date', { date })
+            .leftJoinAndSelect('schedule.class', 'class')
+            .select([
+                'schedule',
+                'teacher.id',
+                'teacher.teacherName',
+                'teacher.experience',
+                'teacher.isForeign',
+                'teacher.isFulltime',
+                'level.id',
+                'level.levelName',
+                'room.id',
+                'room.roomNumber',
+                'room.type',
+                'room.capacity',
+                'course.id',
+                'course.courseName',
+                'course.level',
+                'shift.id',
+                'shift.teachingShift',
+                'shift.startTime',
+                'shift.endTime',
+                'class.id',
+                'class.className',
+                'class.numberOfStudents'
+            ])
             .andWhere('schedule.deletedAt IS NULL')
+            .andWhere('schedule.isDeleted = :isDeleted', { isDeleted: false })
+            .andWhere('teacher.deletedAt IS NULL')
+            .andWhere('teacher.isDeleted = :isDeleted', { isDeleted: false })
+            .andWhere('room.deletedAt IS NULL')
+            .andWhere('room.isDeleted = :isDeleted', { isDeleted: false })
+            .andWhere('course.deletedAt IS NULL')
+            .andWhere('course.isDeleted = :isDeleted', { isDeleted: false })
+            .andWhere('class.deletedAt IS NULL')
+            .andWhere('class.isDeleted = :isDeleted', { isDeleted: false })
             .getMany();
     }
 
@@ -240,6 +273,8 @@ export class ClassScheduleRepository extends Repository<ClassSchedule> {
                 // Create a test shift
                 shift = new Shift();
                 shift.teachingShift = 'Morning Shift (8:00 - 10:00)';
+                shift.startTime = '08:00';
+                shift.endTime = '10:00';
                 shift.classId = 661;
                 shift.isDeleted = false;
                 await shiftRepo.save(shift);
@@ -254,6 +289,13 @@ export class ClassScheduleRepository extends Repository<ClassSchedule> {
             schedule.shiftId = shift.id;
             schedule.teacherId = 1390; // From the room details we saw earlier
             schedule.courseId = 3267; // From the room details we saw earlier
+            schedule.courseName = 'Movers 3';
+            schedule.className = 'Movers 3 - Morning';
+            schedule.mainTeacher = 'Teacher 1';
+            schedule.numberOfStudents = 15;
+            schedule.startDate = new Date('2024-04-15');
+            schedule.endDate = new Date('2024-05-15');
+            schedule.time = '08:00 - 10:00';
             schedule.isDeleted = false;
 
             await this.save(schedule);

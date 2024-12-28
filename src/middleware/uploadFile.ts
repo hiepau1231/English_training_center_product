@@ -1,27 +1,42 @@
 import multer from 'multer';
-import { Request } from 'express';
-import { AppError } from '../utils/AppError';
+import fs from 'fs';
+import path from 'path';
 
-// Cấu hình multer để lưu file vào memory
-const storage = multer.memoryStorage();
+const uploadDir = path.join(__dirname, '../../uploads');
 
-// Kiểm tra file type
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-        file.mimetype === 'application/vnd.ms-excel') {
-        cb(null, true);
-    } else {
-        cb(new AppError('Only Excel files are allowed', 400) as any);
-    }
-};
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Cấu hình upload
-const upload = multer({
-    storage: storage,
-    fileFilter: fileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // Giới hạn 5MB
-    }
+// Allowed file types
+const allowedMimeTypes = [
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+  'application/vnd.ms-excel' // .xls
+];
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
 });
 
-export const uploadExcel = upload.single('file'); 
+const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  if (allowedMimeTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid file type. Only Excel files are allowed.'));
+  }
+};
+
+const uploadFile = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  }
+});
+
+export { uploadFile };

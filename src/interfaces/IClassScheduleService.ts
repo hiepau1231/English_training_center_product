@@ -3,41 +3,16 @@ import { Teacher } from "../entities/Teacher";
 import { Room } from "../entities/Room";
 
 export interface IClassScheduleService {
-    // Xem số lớp đang dạy trong ngày
-    getDailySchedules(date: Date): Promise<{
-        totalClasses: number;
-        schedules: ClassSchedule[];
-    }>;
-
-    // Xem thông tin chi tiết lớp học
+    getAllSchedules(): Promise<{ total: number; schedules: ClassSchedule[] }>;
+    getDailySchedules(date: Date): Promise<{ totalClasses: number; schedules: ClassSchedule[] }>;
     getScheduleDetails(scheduleId: number): Promise<ClassSchedule>;
-
-    // Thay thế giáo viên
     replaceTeacher(scheduleId: number, newTeacherId: number): Promise<ClassSchedule>;
-
-    // Thay đổi phòng học
     replaceRoom(scheduleId: number, newRoomId: number): Promise<ClassSchedule>;
-
-    // Thay đổi giờ dạy
-    rescheduleClass(
-        scheduleId: number,
-        newStartTime: string,
-        newEndTime: string
-    ): Promise<ClassSchedule>;
-
-    // Tìm giáo viên có thể thay thế
-    findAvailableReplacementTeachers(
-        scheduleId: number,
-        date: Date,
-        startTime: string,
-        endTime: string
-    ): Promise<Teacher[]>;
-
-    // Tìm phòng học có thể thay thế
-    findAvailableReplacementRooms(
-        date: Date,
-        startTime: string,
-        endTime: string,
-        minCapacity?: number
-    ): Promise<Room[]>;
+    rescheduleClass(scheduleId: number, startTime: string, endTime: string): Promise<ClassSchedule>;
+    findAvailableReplacementTeachers(scheduleId: number, date: Date, startTime: string, endTime: string): Promise<Teacher[]>;
+    findAvailableReplacementRooms(date: Date, startTime: string, endTime: string, minCapacity?: number): Promise<Room[]>;
+    generateSchedules(params: any): Promise<{ totalClasses: number; totalSchedules: number; schedules: ClassSchedule[] }>;
+    checkConflicts(): Promise<{ totalConflicts: number; conflicts: any[] }>;
+    resolveConflicts(params: any): Promise<{ totalResolved: number; resolved: any[]; remainingConflicts: number }>;
+    getStatistics(): Promise<any>;
 } 

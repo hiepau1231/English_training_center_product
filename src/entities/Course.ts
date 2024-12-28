@@ -18,11 +18,14 @@ export class Course {
     status!: string;
 
     @Column({
-        type: 'enum',
+        type: 'enum', 
         enum: ['Beginner', 'Intermediate', 'Advanced'],
         default: 'Beginner'
     })
     level!: string;
+
+    @Column({ type: 'text', nullable: true })
+    description!: string;
 
     @CreateDateColumn({ name: 'created_at' })
     createdAt!: Date;
@@ -41,4 +44,4 @@ export class Course {
 
     @OneToMany(() => Class, cls => cls.course)
     classes?: Class[];
-} 
+}

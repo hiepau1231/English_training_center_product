@@ -3,6 +3,7 @@ import { ClassDTO } from '../dtos/ClassDTO';
 import { ClassService } from '../services/ClassServices';
 import { AppDataSource } from '../data-source';
 import { ClassSchedule } from '../entities/ClassSchedule';
+import { Room } from '../entities/Room';
 import { AppError } from '../utils/AppError';
 import { IsNull } from 'typeorm';
 
@@ -129,16 +130,12 @@ export class ClassController {
           scheduleDate: date,
           deletedAt: IsNull()
         },
-        relations: {
-          teacher: {
-            level: true
-          },
-          room: true,
-          class: {
-            course: true
-          },
-          shift: true
-        }
+        relations: [
+          'teacher.level',
+          'room',
+          'class.course',
+          'shift'
+        ]
       });
 
       const formattedSchedules: ScheduleResponse[] = schedules.map(schedule => {
@@ -157,10 +154,10 @@ export class ClassController {
             endTime: schedule.shift?.endTime
           },
           room: {
-            id: schedule.room?.id,
-            name: schedule.room?.roomNumber,
-            type: schedule.room?.type,
-            capacity: schedule.room?.capacity,
+            id: typeof schedule.room === 'object' ? (schedule.room as Room)?.id : undefined,
+            name: typeof schedule.room === 'object' ? (schedule.room as Room)?.roomNumber : undefined,
+            type: typeof schedule.room === 'object' ? (schedule.room as Room)?.type : undefined,
+            capacity: typeof schedule.room === 'object' ? (schedule.room as Room)?.capacity : undefined,
             currentStudents: schedule.class?.numberOfStudents || 0
           },
           class: {

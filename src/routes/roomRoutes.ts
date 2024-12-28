@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { RoomController } from '../controllers/RoomController';
-import { uploadExcel } from '../middleware/uploadFile';
+import { uploadFile } from '../middleware/uploadFile';
 import { catchAsync } from '../utils/AppError';
 
 const router = Router();
@@ -8,7 +8,7 @@ const roomController = new RoomController();
 
 // Upload danh sách phòng từ Excel
 router.post('/upload', 
-    uploadExcel,
+    uploadFile.single('file'),
     catchAsync(roomController.uploadRooms.bind(roomController))
 );
 

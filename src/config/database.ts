@@ -6,6 +6,9 @@ import { TeacherLevel } from '../entities/TeacherLevel';
 import { Room } from '../entities/Room';
 import { Course } from '../entities/Course';
 import { ClassSchedule } from '../entities/ClassSchedule';
+import { Class } from '../entities/Class';
+import { ClassTeacher } from '../entities/ClassTeacher';
+import { Shift } from '../entities/Shift';
 import dotenv from 'dotenv';
 
 // Load .env file
@@ -25,7 +28,10 @@ export const AppDataSource = new DataSource({
     TeacherLevel,
     Room,
     Course,
-    ClassSchedule
+    ClassSchedule,
+    Class,
+    ClassTeacher,
+    Shift
   ],
   migrations: [
     path.join(__dirname, '/../migrations/*ts'),

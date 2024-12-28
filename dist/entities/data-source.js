@@ -3,17 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppDataSource = void 0;
 require("reflect-metadata");
 const typeorm_1 = require("typeorm");
-const classEntity_1 = require("./classEntity");
-// import { Classroom } from './classroomEntity';
-// import { ClassSchedule } from './classScheduleEntity';
-// import { ClassTeacher } from './classTeacherEntity';
-// import { Course } from './courseEntity';
-// import { Level } from './levelEntity';
-// import { Schedule } from './scheduleEntity';
-// import { ScheduleShift } from './scheduleShiftEntity';
-// import { Shift } from './shiftEntity';
-// import { Teacher } from './teacherEntity';
-// import { TeacherLevel } from './teacherLevelEntity';
+const Class_1 = require("./Class");
+const classroomEntity_1 = require("./classroomEntity");
+const classScheduleEntity_1 = require("./classScheduleEntity");
+const classTeacherEntity_1 = require("./classTeacherEntity");
+const courseEntity_1 = require("./courseEntity");
+const levelEntity_1 = require("./levelEntity");
+const scheduleEntity_1 = require("./scheduleEntity");
+const scheduleShiftEntity_1 = require("./scheduleShiftEntity");
+const shiftEntity_1 = require("./shiftEntity");
+const teacherEntity_1 = require("./teacherEntity");
+const teacherLevelEntity_1 = require("./teacherLevelEntity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
@@ -24,19 +24,18 @@ exports.AppDataSource = new typeorm_1.DataSource({
     synchronize: false,
     logging: true,
     entities: [
-        classEntity_1.Class,
-        // Schedule,
-        // Course,
-        // Teacher,
-        // Classroom,
-        // Shift,
-        // ClassTeacher,
-        // ClassSchedule,
-        // TeacherLevel,
-        // Level,
-        // ScheduleShift
+        Class_1.Class,
+        scheduleEntity_1.Schedule,
+        courseEntity_1.Course,
+        teacherEntity_1.Teacher,
+        classroomEntity_1.Classroom,
+        shiftEntity_1.Shift,
+        classTeacherEntity_1.ClassTeacher,
+        classScheduleEntity_1.ClassSchedule,
+        teacherLevelEntity_1.TeacherLevel,
+        levelEntity_1.Level,
+        scheduleShiftEntity_1.ScheduleShift
     ],
     migrations: [],
     subscribers: [],
 });
-//# sourceMappingURL=data-source.js.map

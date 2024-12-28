@@ -52,7 +52,8 @@ interface TransformedClass extends Omit<Class, 'schedules' | 'classTeachers'> {
 
 export class RoomRepository extends Repository<Room> {
     constructor() {
-        super(Room, AppDataSource.manager);
+        const repository = AppDataSource.getRepository(Room);
+        super(repository.target, repository.manager, repository.queryRunner);
     }
 
     async findByRoomNumber(roomNumber: string): Promise<Room | null> {

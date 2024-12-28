@@ -8,7 +8,7 @@ export class Room {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({ name: 'classroom_name' })
+    @Column({ name: 'classroom_name', length: 100 })
     roomNumber!: string;
 
     @Column()
@@ -16,12 +16,12 @@ export class Room {
 
     @Column({
         type: 'enum',
-        enum: ['Phong Nghe Nhin', 'Phong Truc Tuyen', 'Phong Online', 'Phong cho tre'],
+        enum: ['Phong Nghe Nhin', 'Phong Truc Tuyen', 'Phong Online', 'Phong Cho Tre'],
         default: 'Phong Truc Tuyen'
     })
     type!: string;
 
-    @Column({ type: 'boolean', default: false })
+    @Column({ default: false })
     status!: boolean;
 
     @CreateDateColumn({ name: 'created_at' })
@@ -33,7 +33,7 @@ export class Room {
     @DeleteDateColumn({ name: 'deleted_at', nullable: true })
     deletedAt!: Date | null;
 
-    @Column({ name: 'is_deleted', type: 'boolean', default: false })
+    @Column({ name: 'is_deleted', default: false })
     isDeleted!: boolean;
 
     @OneToMany(() => ClassSchedule, schedule => schedule.room)

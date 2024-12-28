@@ -6,6 +6,7 @@ import roomRoutes from "./routes/roomRoutes";
 import importRoutes from "./routes/import.routes";
 import testRoutes from "./routes/test.routes";
 import classRouter from "./routes/ClassRoute";
+import classScheduleRoutes from "./routes/classScheduleRoutes";
 import { errorHandler } from './middleware/errorHandler';
 import { AppError } from './utils/AppError';
 
@@ -25,6 +26,7 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/import', importRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/classes', classRouter);
+app.use('/api/class-schedules', classScheduleRoutes);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {

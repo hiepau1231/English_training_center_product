@@ -51,10 +51,14 @@ interface ConflictResolution {
 
 type ClassType = 'regular' | 'tutorial' | 'minispeaking';
 
+interface RoomReference {
+    id: number;
+}
+
 interface ScheduleConflict {
     scheduleDate: Date;
     shift: Shift;
-    room: Room;
+    room: Room | RoomReference;
     classes: Class[];
 }
 
@@ -77,20 +81,81 @@ export class ClassScheduleService implements IClassScheduleService {
         private roomRepo: RoomRepository
     ) {}
 
-    async getDailySchedules(date: Date): Promise<{ totalClasses: number; schedules: ClassSchedule[] }> {
-        const schedules = await this.classScheduleRepo.findSchedulesByDate(date);
+    async getAllSchedules(): Promise<{ total: number; schedules: ClassSchedule[] }> {
+        const schedules = await this.classScheduleRepo.find({
+            relations: ['class', 'room', 'teacher', 'shift'],
+            order: { scheduleDate: 'ASC' }
+        });
         return {
-            totalClasses: schedules.length,
+            total: schedules.length,
             schedules
         };
     }
 
-    async getScheduleDetails(scheduleId: number): Promise<ClassSchedule> {
-        const schedule = await this.classScheduleRepo.findScheduleDetail(scheduleId);
-        if (!schedule) {
-            throw new AppError("Schedule not found", 404);
+    async getDailySchedules(date: Date): Promise<{ totalClasses: number; schedules: ClassSchedule[] }> {
+        try {
+            const schedules = await this.classScheduleRepo.find({
+                where: {
+                    scheduleDate: date,
+                    deletedAt: IsNull()
+                },
+                relations: [
+                    'class',
+                    'class.course',
+                    'room',
+                    'teacher',
+                    'teacher.level',
+                    'shift'
+                ],
+                order: {
+                    shift: {
+                        startTime: 'ASC'
+                    }
+                }
+            });
+
+            return {
+                totalClasses: schedules.length,
+                schedules
+            };
+        } catch (error) {
+            console.error('Error in getDailySchedules service:', error);
+            throw new AppError(
+                'Failed to fetch daily schedules',
+                500
+            );
         }
-        return schedule;
+    }
+
+    async getScheduleDetails(scheduleId: number): Promise<ClassSchedule> {
+        try {
+            const schedule = await this.classScheduleRepo.findOne({
+                where: {
+                    id: scheduleId,
+                    deletedAt: IsNull()
+                },
+                relations: [
+                    'class',
+                    'class.course',
+                    'room',
+                    'teacher',
+                    'teacher.level',
+                    'shift'
+                ]
+            });
+
+            if (!schedule) {
+                throw new AppError('Schedule not found', 404);
+            }
+
+            return schedule;
+        } catch (error) {
+            console.error('Error in getScheduleDetails service:', error);
+            throw new AppError(
+                'Failed to fetch schedule details',
+                500
+            );
+        }
     }
 
     async replaceTeacher(scheduleId: number, newTeacherId: number): Promise<ClassSchedule> {
@@ -190,28 +255,21 @@ export class ClassScheduleService implements IClassScheduleService {
 
     async rescheduleClass(
         scheduleId: number,
-        newStartTime: string,
-        newEndTime: string
+        startTime: string,
+        endTime: string
     ): Promise<ClassSchedule> {
         const schedule = await this.getScheduleDetails(scheduleId);
 
-        if (!schedule.roomId) {
-            throw new AppError("Room information not found", 404);
+        if (!schedule.shift) {
+            throw new AppError("Schedule shift information not found", 404);
         }
 
-        if (!schedule.teacherId) {
-            throw new AppError("Teacher information not found", 404);
-        }
-
-        if (!schedule.scheduleDate) {
-            throw new AppError("Schedule date not found", 404);
-        }
-
+        // Check for room conflicts
         const hasRoomConflict = await this.classScheduleRepo.checkTimeConflict(
             schedule.roomId,
             schedule.scheduleDate,
-            newStartTime,
-            newEndTime,
+            startTime,
+            endTime,
             scheduleId
         );
 
@@ -219,11 +277,12 @@ export class ClassScheduleService implements IClassScheduleService {
             throw new AppError("Room is not available at new time", 400);
         }
 
+        // Check for teacher conflicts
         const hasTeacherConflict = await this.checkTeacherAvailability(
             schedule.teacherId,
             schedule.scheduleDate,
-            newStartTime,
-            newEndTime,
+            startTime,
+            endTime,
             scheduleId
         );
 
@@ -231,11 +290,34 @@ export class ClassScheduleService implements IClassScheduleService {
             throw new AppError("Teacher is not available at new time", 400);
         }
 
-        const updatedSchedule = await this.classScheduleRepo.updateScheduleTime(scheduleId, newStartTime, newEndTime);
-        if (!updatedSchedule) {
-            throw new AppError("Failed to update schedule", 500);
+        try {
+            // Update shift times
+            await AppDataSource.getRepository('shifts').update(
+                schedule.shift.id,
+                {
+                    startTime: `${startTime}:00`,
+                    endTime: `${endTime}:00`,
+                    teachingShift: `${startTime} - ${endTime}`,
+                    updatedAt: new Date()
+                }
+            );
+
+            // Update schedule time field
+            await this.classScheduleRepo.update(
+                scheduleId,
+                {
+                    time: `${startTime} - ${endTime}`,
+                    updatedAt: new Date()
+                }
+            );
+
+            // Fetch and return updated schedule
+            const updatedSchedule = await this.getScheduleDetails(scheduleId);
+            return updatedSchedule;
+        } catch (error) {
+            console.error('Error updating schedule times:', error);
+            throw new AppError("Failed to update schedule times", 500);
         }
-        return updatedSchedule;
     }
 
     async findAvailableReplacementTeachers(
@@ -245,11 +327,11 @@ export class ClassScheduleService implements IClassScheduleService {
         endTime: string
     ): Promise<Teacher[]> {
         const schedule = await this.getScheduleDetails(scheduleId);
-        
+
         if (!schedule.teacher?.level?.id) {
             throw new AppError("Current teacher level information not found", 404);
         }
-        
+
         const currentTeacherLevel = schedule.teacher.level.id;
 
         // Get all teachers of same level
@@ -257,6 +339,10 @@ export class ClassScheduleService implements IClassScheduleService {
             currentTeacherLevel,
             false // not deleted
         );
+
+        if (!teachers || teachers.length === 0) {
+            return [];
+        }
 
         // Filter out teachers with conflicts
         const availableTeachers = [];
@@ -385,7 +471,8 @@ export class ClassScheduleService implements IClassScheduleService {
         for (const schedule of schedules) {
             if (!schedule.scheduleDate || !schedule.shift || !schedule.room) continue;
             
-            const key = `${schedule.scheduleDate.toISOString()}_${schedule.shift.id}_${schedule.room.id}`;
+            const roomId = typeof schedule.room === 'object' && schedule.room !== null ? (schedule.room as Room | RoomReference).id : 0;
+            const key = `${schedule.scheduleDate.toISOString()}_${schedule.shift.id}_${roomId}`;
             
             if (!scheduleMap.has(key)) {
                 scheduleMap.set(key, []);
@@ -405,7 +492,7 @@ export class ClassScheduleService implements IClassScheduleService {
                     conflicts.push({
                         scheduleDate: new Date(date),
                         shift,
-                        room,
+                        room: typeof room === 'string' ? { id: parseInt(room, 10) } : room,
                         classes
                     });
                 }
@@ -424,7 +511,7 @@ export class ClassScheduleService implements IClassScheduleService {
                 continue;
             }
 
-            // Tìm phòng thay th��� phù hợp
+            // Tìm phòng thay thế phù hợp
             const alternativeRooms = await this.findAvailableReplacementRooms(
                 conflict.scheduleDate,
                 conflict.shift.startTime,
@@ -551,8 +638,9 @@ export class ClassScheduleService implements IClassScheduleService {
 
         // Process classroom statistics
         schedules.forEach(schedule => {
-            if (schedule.room?.id) {
-                stats.byClassroom[schedule.room.id] = (stats.byClassroom[schedule.room.id] || 0) + 1;
+            const roomId = typeof schedule.room === 'object' && schedule.room !== null ? (schedule.room as Room | RoomReference).id : 0;
+            if (roomId) {
+                stats.byClassroom[roomId] = (stats.byClassroom[roomId] || 0) + 1;
             }
         });
 
@@ -649,8 +737,9 @@ export class ClassScheduleService implements IClassScheduleService {
             }
 
             // Count by room
-            if (schedule.room?.id) {
-                stats.byClassroom[schedule.room.id] = (stats.byClassroom[schedule.room.id] || 0) + 1;
+            const roomId = typeof schedule.room === 'object' && schedule.room !== null ? (schedule.room as Room | RoomReference).id : 0;
+            if (roomId) {
+                stats.byClassroom[roomId] = (stats.byClassroom[roomId] || 0) + 1;
             }
         });
 
@@ -749,4 +838,4 @@ export class ClassScheduleService implements IClassScheduleService {
             throw new AppError('Failed to fetch room schedules', 500);
         }
     }
-} 
+}

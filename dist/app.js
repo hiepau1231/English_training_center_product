@@ -3,31 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const body_parser_1 = __importDefault(require("body-parser"));
-const cors_1 = __importDefault(require("cors"));
-const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
-require("reflect-metadata");
-const database_1 = require("./config/database");
-const routes_1 = __importDefault(require("./routes"));
+const cors_1 = __importDefault(require("cors"));
+const morgan_1 = __importDefault(require("morgan"));
+const classScheduleRoutes_1 = __importDefault(require("./routes/classScheduleRoutes"));
+const roomRoutes_1 = __importDefault(require("./routes/roomRoutes"));
+const import_routes_1 = __importDefault(require("./routes/import.routes"));
 const app = (0, express_1.default)();
-dotenv_1.default.config();
 // Middleware
 app.use((0, cors_1.default)());
-app.use(body_parser_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.json());
+app.use((0, morgan_1.default)('dev'));
 // Routes
-app.use('/api', routes_1.default);
-database_1.AppDataSource.initialize()
-    .then(() => {
-    console.log('Database connected successfully');
-    // Start the server if the database connection is successful
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-    });
-})
-    .catch((error) => {
-    console.error('Error connecting to the database:', error);
-});
-//# sourceMappingURL=app.js.map
+app.use('/api/class-schedules', classScheduleRoutes_1.default);
+app.use('/api/rooms', roomRoutes_1.default);
+app.use('/api/import', import_routes_1.default);
+exports.default = app;

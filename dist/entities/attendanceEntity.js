@@ -39,4 +39,3 @@
 //   // Quan hệ nhiều-1 với Student
 //   @ManyToOne(() => Student, (student) => student.attendances)
 //   relatedStu
-//# sourceMappingURL=attendanceEntity.js.map

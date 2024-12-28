@@ -2,6 +2,7 @@ import { ClassDTO } from '../dtos/ClassDTO';
 import { Class } from '../entities/Class';
 import { ClassRepository } from '../repositories/ClassRepository';
 import { BaseService } from './BaseService';
+import { AppDataSource } from '../data-source';
 
 export class ClassService extends BaseService<Class, ClassDTO> {
 
@@ -30,7 +31,21 @@ export class ClassService extends BaseService<Class, ClassDTO> {
    * Tạo mới lớp học
    */
   async createClass(classDTO: ClassDTO): Promise<ClassDTO> {
+    // Ensure database connection is initialized
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    
     const classEntity = this.toEntity(classDTO);
+    
+    // Convert string dates to Date objects
+    if (classDTO.startDate) {
+      classEntity.startDate = new Date(classDTO.startDate);
+    }
+    if (classDTO.endDate) {
+      classEntity.endDate = new Date(classDTO.endDate);
+    }
+    
     const newClass = await this.classRepository.create(classEntity);
     return this.toDTO(newClass);
   }

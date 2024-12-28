@@ -24,7 +24,7 @@ export class Class {
     @Column({ name: 'end_date', type: 'date', nullable: true })
     endDate!: Date;
 
-    @Column({ name: 'student_count', type: 'int', default: 0 })
+    @Column({ name: 'number_of_students', type: 'int', default: 0 })
     numberOfStudents!: number;
 
     @Column({ name: 'is_deleted', type: 'boolean', default: false })
